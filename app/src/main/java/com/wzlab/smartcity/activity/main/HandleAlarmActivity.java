@@ -19,6 +19,11 @@ import android.widget.Toast;
 import com.skateboard.zxinglib.CaptureActivity;
 import com.wzlab.smartcity.R;
 import com.wzlab.smartcity.activity.account.Config;
+import com.wzlab.smartcity.net.HttpMethod;
+import com.wzlab.smartcity.net.NetConnection;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,17 +40,20 @@ public class HandleAlarmActivity extends AppCompatActivity {
     private EditText mEtid,mEtdetail;
     private String deviceInfo,cardNumber;
     TextView text;
+    private String phone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handle_alarm);
+        phone = Config.getCachedPhone(getApplicationContext());
         text=findViewById(R.id.tv_http);
-        findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SubmitURL(Config.SERVER_URL+Config.ACTION_UPLOAD_REPAIR_RESULT);
-            }
-        });
+//        findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                SubmitURL(Config.SERVER_URL+Config.ACTION_UPLOAD_REPAIR_RESULT);
+//            }
+//        });
 
         String[] ctype = new String[]{"请选择故障类型", "摄像头损坏", "APP出现BUG", "网络问题"};
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, ctype);  //创建一个数组适配器
@@ -75,7 +83,7 @@ public class HandleAlarmActivity extends AppCompatActivity {
                 String detail = mEtdetail.getText().toString().trim();
 
 
-
+                uploadRepairResult("phone",phone,"device_id",deviceId,"result_description",detail);
                 Toast.makeText(HandleAlarmActivity.this,"提交成功"+ deviceId+cardNumber +detail,Toast.LENGTH_SHORT).show();
             }
         });
@@ -93,67 +101,95 @@ public class HandleAlarmActivity extends AppCompatActivity {
         });
 
     }
-    public void SubmitURL(String url){
-        new AsyncTask<String,Float,String>(){
 
+    private void uploadRepairResult(String ... kv) {
+        new NetConnection(Config.SERVER_URL + Config.ACTION_UPLOAD_REPAIR_RESULT, HttpMethod.POST, new NetConnection.SuccessCallback() {
             @Override
-            protected String doInBackground(String... strings) {
-                String phone="18392888103";
-                String device_id="";
-                String result_description="";
+            public void onSuccess(String result) {
                 try {
-                    URL url = new URL(strings[0]);
-                    URLConnection connection=url.openConnection();
-                    long total = connection.getContentLength();
-                    InputStream inputStream = connection.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(inputStream);
-                    BufferedReader br = new BufferedReader(isr);
-                    String line;
-                    StringBuilder builder = new StringBuilder();
-                    while((line=br.readLine())!=null){
-                        builder.append(line);
-                        publishProgress((float)builder.toString().length()/total);
+                    JSONObject jsonObject = new JSONObject(result);
+
+                    if(jsonObject.getString("status").equals("1")){
+                        String msg = jsonObject.getString("msg");
+                        Toast.makeText(getApplicationContext(), msg ,Toast.LENGTH_SHORT).show();
+                    }else{
+
                     }
-                    br.close();
-                    inputStream.close();
-                    return builder.toString();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return null;
-            }
 
-            @Override
-            protected void onCancelled() {
-                super.onCancelled();
             }
-
+        }, new NetConnection.FailCallback() {
             @Override
-            protected void onCancelled(String s) {
-                super.onCancelled(s);
+            public void onFail() {
+                Toast.makeText(getApplicationContext(),"未能连接服务器",Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            protected void onPostExecute(String s) {
-                text.setText(s);
-                super.onPostExecute(s);
-            }
-
-            @Override
-            protected void onPreExecute() {
-                Toast.makeText(HandleAlarmActivity.this,"开始读取",Toast.LENGTH_SHORT).show();
-                super.onPreExecute();
-            }
-
-            @Override
-            protected void onProgressUpdate(Float... values) {
-                System.err.println(values[0]);
-                super.onProgressUpdate(values);
-            }
-        }.execute(url);
+        },kv);
     }
+
+//    public void SubmitURL(String url){
+//        new AsyncTask<String,Float,String>(){
+//
+//            @Override
+//            protected String doInBackground(String... strings) {
+//                String phone="18392888103";
+//                String device_id="";
+//                String result_description="";
+//                try {
+//                    URL url = new URL(strings[0]);
+//                    URLConnection connection=url.openConnection();
+//                    long total = connection.getContentLength();
+//                    InputStream inputStream = connection.getInputStream();
+//                    InputStreamReader isr = new InputStreamReader(inputStream);
+//                    BufferedReader br = new BufferedReader(isr);
+//                    String line;
+//                    StringBuilder builder = new StringBuilder();
+//                    while((line=br.readLine())!=null){
+//                        builder.append(line);
+//                        publishProgress((float)builder.toString().length()/total);
+//                    }
+//                    br.close();
+//                    inputStream.close();
+//                    return builder.toString();
+//                } catch (MalformedURLException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onCancelled() {
+//                super.onCancelled();
+//            }
+//
+//            @Override
+//            protected void onCancelled(String s) {
+//                super.onCancelled(s);
+//            }
+//
+//            @Override
+//            protected void onPostExecute(String s) {
+//                text.setText(s);
+//                super.onPostExecute(s);
+//            }
+//
+//            @Override
+//            protected void onPreExecute() {
+//                Toast.makeText(HandleAlarmActivity.this,"开始读取",Toast.LENGTH_SHORT).show();
+//                super.onPreExecute();
+//            }
+//
+//            @Override
+//            protected void onProgressUpdate(Float... values) {
+//                System.err.println(values[0]);
+//                super.onProgressUpdate(values);
+//            }
+//        }.execute(url);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode,int resultCode,Intent data){
