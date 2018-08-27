@@ -135,9 +135,13 @@ public class AlarmFragment extends Fragment {
         drawMarker(latLngList);
 
 
+        initView();
 
 
 
+    }
+
+    private void initView() {
     }
 
     // 绘制标志物

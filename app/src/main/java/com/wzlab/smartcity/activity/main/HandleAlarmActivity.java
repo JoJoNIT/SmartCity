@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,7 +48,7 @@ public class HandleAlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handle_alarm);
         phone = Config.getCachedPhone(getApplicationContext());
-        text=findViewById(R.id.tv_http);
+
 //        findViewById(R.id.btn_submit).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -82,10 +83,12 @@ public class HandleAlarmActivity extends AppCompatActivity {
                 String deviceId = mEtid.getText().toString().trim();
                 String detail = mEtdetail.getText().toString().trim();
 
-
+            if(TextUtils.isEmpty(deviceId)){
+            Toast.makeText(HandleAlarmActivity.this, "请扫描二维码", Toast.LENGTH_SHORT).show();
+            }else{
                 uploadRepairResult("phone",phone,"device_id",deviceId,"result_description",detail);
                 Toast.makeText(HandleAlarmActivity.this,"提交成功"+ deviceId+cardNumber +detail,Toast.LENGTH_SHORT).show();
-            }
+            }}
         });
 
         mIvpicture = findViewById(R.id.iv_picture);

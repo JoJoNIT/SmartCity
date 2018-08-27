@@ -13,7 +13,10 @@
         android:layout_width="180dp"
         android:layout_height="40dp"
         android:paddingLeft="10dp"
-        android:text="请扫描设备上的二维码"
+        android:hint="请扫描设备上的二维码"
+        android:clickable="false"
+        android:focusable="false"
+        android:enabled="false"
         android:textSize="15sp"
         android:textColor="#aaa"
         android:background="@drawable/bg_black"/>
@@ -69,16 +72,6 @@
         android:layout_marginRight="10dp"
         android:layout_width="match_parent"
         android:layout_height="40dp" />
-    <ScrollView
-        android:layout_below="@id/btn_submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/tv_http"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"/>
-    </ScrollView>
 
 
 
