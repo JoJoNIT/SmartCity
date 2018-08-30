@@ -75,11 +75,11 @@ public class MainActivity extends AppCompatActivity
 
         mVpMainContainer = findViewById(R.id.vp_main_container);
         ArrayList<Fragment> mFragmentList = new ArrayList<>();
-        Fragment deviceOverviewFragment = new DeviceOverviewFragment();
+        Fragment tabViewFragment = new TabViewFragment();
         Fragment alarmFragment = new AlarmFragment();
         Fragment meFragment = new MeFragment();
 
-        mFragmentList.add(deviceOverviewFragment);
+        mFragmentList.add(tabViewFragment);
         mFragmentList.add(alarmFragment);
         mFragmentList.add(meFragment);
         ViewPagerAdapter mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mFragmentList);
